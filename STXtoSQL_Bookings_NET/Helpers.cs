@@ -21,9 +21,8 @@ namespace STXtoSQL
         {
             get
             {
-                _STRATIXDataConnString = "Data Source=VC-030\\SQLDEV2014VC030;Initial Catalog=STRATIXData;User ID=DataImporter;Password=cX63o4qd";
-                //_STRATIXDataConnString = "Data Source=VC-030\\SQLDEV2014VC030;Initial Catalog=STRATIXData;User ID=ReportRunner;Password=vH1bC1J6W";
-                //_STRATIXDataConnString = "Data Source=VC-030\\SQLEXPRESS;Initial Catalog=STRATIXData;User ID=ReportRunner;Password=vH1bC1J6W";
+                //_STRATIXDataConnString = "Data Source=VC-030\\SQLDEV2014VC030;Initial Catalog=STRATIXData;User ID=DataImporter;Password=cX63o4qd";
+                _STRATIXDataConnString = "Data Source=VC-030\\SQLDEV2014VC030;Initial Catalog=STRATIXData;Integrated Security=SSPI";               
 
                 if (string.IsNullOrEmpty(_STRATIXDataConnString))
                 {

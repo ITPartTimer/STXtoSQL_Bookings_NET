@@ -1,47 +1,62 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using STXtoSQL.DataAccess;
 using STXtoSQL.Models;
+using STXtoSQL.Log;
 
 namespace STXtoSQL_Bookings_NET
 {
     class Program
     {
         static void Main(string[] args)
-        {
+        {          
             // Args will change based on STXtoSQL program goal
-            //List<string> lstArgs = new List<string>();
-
             string date1 = "";
             string date2 = "";
-
+            int odbcCnt = 0;
+            int insertCnt = 0;
+            int importCnt = 0;
+        
             try
             {
                 if (args.Length > 0)
                 {
-                    // args = date range
+                    /*
+                     * Must be in format mm/dd/yyyy.  No time part
+                     */
                     date1 = args[0].ToString();
                     date2 = args[1].ToString();
                 }
                 else
                 {
-                    // No args = yesterday
-                    // Yesterday = -1.  testing = -2 or more
-                    DateTime dtYst = DateTime.Now.AddDays(-3);
-                    date1 = dtYst.Month.ToString() + "/" + dtYst.Day.ToString() + "/" + dtYst.Year.ToString();
-                    date2 = date1;
+                    // No args = current month to yesterday
+                    DateTime dtToday = DateTime.Today;
+
+                    DateTime dtFirst = new DateTime(dtToday.Year, dtToday.Month, 1);
+
+                    /*
+                     * Need one date part of datetime.
+                     * Time and date are separated by a space, so split the string
+                     * and only use the 1st element.
+                     */
+                    string[] date1Split = dtFirst.ToString().Split(' ');
+                    string[] date2Split = dtToday.AddDays(-1).ToString().Split(' ');
+
+                    date1 = date1Split[0];
+                    date2 = date2Split[0];
                 }
             }
             catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message.ToString());
+            {               
+                Logger.LogWrite("EXC", ex);
+                Logger.LogWrite("MSG", "Return");
+                return;
+                //Console.WriteLine(ex.Message.ToString());
             }
-
-            // Testing
-            Console.WriteLine(date1 + " / " + date2);
 
             #region FromSTRATIX
             ODBCData objODBC = new ODBCData();
@@ -54,58 +69,57 @@ namespace STXtoSQL_Bookings_NET
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message.ToString());
+                Logger.LogWrite("EXC", ex);
+                Logger.LogWrite("MSG", "Return");
+                return;
+                //Console.WriteLine(ex.Message.ToString());
             }
-
-            // Testing
-            Console.WriteLine("Retrieve records: " + lstBookings.Count.ToString());
-
-            foreach (Bookings b in lstBookings)
-            {
-                Console.WriteLine(b.brh + " / " + b.pep + " / " + b.wgt + " / " + b.sls + " / " + b.actvy_dt + " / " + b.mn.ToString() + " / " + b.dy.ToString() + " / " + b.yr.ToString());
-            }
-            // Testings.  I just want to see query results and not insert into SQL
-            lstBookings.Clear();
-
             #endregion
 
             #region ToSQL
-            int rowCnt = 0;
-
             SQLData objSQL = new SQLData();
 
             // Only work in SQL database, if records were retreived from Stratix
             if (lstBookings.Count != 0)
             {
-                // Put lstBookings into TMP Bookings table
+                odbcCnt = lstBookings.Count;
+
+                // Put lstBookings into IMPORT Bookings table
                 try
                 {
-                    rowCnt = objSQL.Write_Bookings_TMP(lstBookings);
-                    Console.WriteLine("TMP inserted: " + rowCnt.ToString());
+                    importCnt = objSQL.Write_Bookings_IMPORT(lstBookings);
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine(ex.Message.ToString());
+                    Logger.LogWrite("EXC", ex);
+                    Logger.LogWrite("MSG", "Return");
+                    return;
+                    //Console.WriteLine(ex.Message.ToString());
                 }
 
-                // Call SP to put TMP Bookings into Bookings table
+                // Call SP to put IMPORT Bookings into Bookings table
                 try
                 {
-                    rowCnt = objSQL.Write_TMP_to_Bookings();
-                    Console.WriteLine("Bookings inserted: " + rowCnt.ToString());
+                    insertCnt = objSQL.Write_IMPORT_to_Bookings(date1, date2);
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine(ex.Message.ToString());
+                    Logger.LogWrite("EXC", ex);
+                    Logger.LogWrite("MSG", "Return");
+                    return;
+                    //Console.WriteLine(ex.Message.ToString());
                 }
+
+                Logger.LogWrite("MSG", "Range=" + date1 + ":" + date2 + " ODBC/IMPORT/INSERT=" + odbcCnt.ToString() + ":" + importCnt.ToString() + ":" + insertCnt.ToString());
             }
-
+            else
+                Logger.LogWrite("MSG", "No data");
 
             #endregion
 
             // Testing
-            Console.WriteLine("Press key to exit");
-            Console.ReadKey();
+            //Console.WriteLine("Press key to exit");
+            //Console.ReadKey();
         }
     }
 }
