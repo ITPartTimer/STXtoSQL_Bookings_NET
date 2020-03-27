@@ -13,7 +13,9 @@ namespace STXtoSQL_Bookings_NET
     class Program
     {
         static void Main(string[] args)
-        {          
+        {
+            Logger.LogWrite("MSG", "Start: " + DateTime.Now.ToString());
+
             // Args will change based on STXtoSQL program goal
             string date1 = "";
             string date2 = "";
@@ -115,6 +117,7 @@ namespace STXtoSQL_Bookings_NET
             else
                 Logger.LogWrite("MSG", "No data");
 
+            Logger.LogWrite("MSG", "End: " + DateTime.Now.ToString());
             #endregion
 
             // Testing
