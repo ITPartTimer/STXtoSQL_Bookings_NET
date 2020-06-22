@@ -14,9 +14,7 @@ namespace STXtoSQL.DataAccess
 
             List<Bookings> lstBookings = new List<Bookings>();
 
-            OdbcConnection conn = new OdbcConnection(ODBCDataConnString);
-            //OdbcConnection conn = new OdbcConnection("DSN=Invera;UID=livcalod;Pwd=livcalod");
-            
+            OdbcConnection conn = new OdbcConnection(ODBCDataConnString);         
 
             try
             {

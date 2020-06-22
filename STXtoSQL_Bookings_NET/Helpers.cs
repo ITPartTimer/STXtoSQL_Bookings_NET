@@ -21,8 +21,10 @@ namespace STXtoSQL
         {
             get
             {
-                //_STRATIXDataConnString = "Data Source=VC-030\\SQLDEV2014VC030;Initial Catalog=STRATIXData;User ID=DataImporter;Password=cX63o4qd";
-                _STRATIXDataConnString = "Data Source=VC-030\\SQLDEV2014VC030;Initial Catalog=STRATIXData;Integrated Security=SSPI";               
+                string sql = Environment.GetEnvironmentVariable("sysSQLServer");
+                string cat = ConfigurationManager.AppSettings.Get("InitCat");
+
+                _STRATIXDataConnString = "Data Source=" + sql + ";Initial Catalog=" + cat + ";Integrated Security=SSPI";
 
                 if (string.IsNullOrEmpty(_STRATIXDataConnString))
                 {
@@ -32,9 +34,7 @@ namespace STXtoSQL
                 {
                     return _STRATIXDataConnString;
                 }
-
             }
-
         } //STRATIXDataConnString
 
         // ODBC to Stratix using DSN names on local machine
@@ -42,9 +42,12 @@ namespace STXtoSQL
         {
             get
             {
-                //string dsn = ConfigurationManager.AppSettings.Get("DSN");
+                // DSN stored in System Environment variables
+                string dsn = Environment.GetEnvironmentVariable("sysStratixDSN");
+                string uid = Environment.GetEnvironmentVariable("sysStratixUID");
+                string pwd = Environment.GetEnvironmentVariable("sysStratixPWD");
 
-                _ODBCDataConnString = "DSN=Invera;UID=livcalod;Pwd=livcalod";
+                _ODBCDataConnString = "DSN=" + dsn + ";UID=" + uid + ";Pwd=" + pwd;
 
                 if (string.IsNullOrEmpty(_ODBCDataConnString))
                 {
@@ -54,9 +57,7 @@ namespace STXtoSQL
                 {
                     return _ODBCDataConnString;
                 }
-
             }
-
         }
 
         // Is the number integer.  True, if conversion is a success
