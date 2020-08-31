@@ -37,8 +37,24 @@ namespace STXtoSQL_Bookings_NET
                 {
                     // No args = current month to yesterday
                     DateTime dtToday = DateTime.Today;
+                    DateTime dtFirst;
 
-                    DateTime dtFirst = new DateTime(dtToday.Year, dtToday.Month, 1);
+                    /*
+                     * If 1st day of month, start from the last day of previous month
+                     * or that day will be missed in the report
+                     * ex: Today os 8/1, dtFirst should be 7/31
+                     */
+
+                     // != 1 used to test.  Should be == 1
+                    if (DateTime.Today.Day == 1)
+                    {
+                        // Get number of days in previous month
+                        int dtDaysInMonth = DateTime.DaysInMonth(dtToday.Year, dtToday.Month - 1);
+                        // Create new DateTime using last month and last day of last month
+                        dtFirst = new DateTime(dtToday.Year, dtToday.Month-1, dtDaysInMonth);
+                    }
+                    else
+                        dtFirst = new DateTime(dtToday.Year, dtToday.Month, 1);
 
                     /*
                      * Need one date part of datetime.

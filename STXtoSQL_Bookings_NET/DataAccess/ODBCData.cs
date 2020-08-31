@@ -23,8 +23,8 @@ namespace STXtoSQL.DataAccess
                 // Try to split with verbatim literal
                 OdbcCommand cmd = conn.CreateCommand();
 
-                cmd.CommandText = @"select bsb_brh,bsb_pep[1,2] as pep,bsb_s_tot_wgt+bsb_a_tot_wgt as wgt,bsb_s_tot_sls+bsb_a_tot_sls as sls,bsb_actvy_dt,
-	                                MONTH(bsb_actvy_dt) as mn,DAY(bsb_actvy_dt) as dy,YEAR(bsb_actvy_dt) as yr
+                cmd.CommandText = @"select bsb_brh,SUBSTRING(bsb_pep,1,2) as pep,bsb_s_tot_wgt+bsb_a_tot_wgt as wgt,bsb_s_tot_sls+bsb_a_tot_sls as sls,bsb_actvy_dt,
+	                                DATE_PART('month',bsb_actvy_dt) as mn,DATE_PART('day',bsb_actvy_dt) as dy,DATE_PART('year',bsb_actvy_dt) as yr
 	                                from orsbsb_rec 
 	                                where bsb_ord_pfx = 'SO' and bsb_brh in ('SW','MS','CS','AR') and bsb_actvy_dt >= '" + date1 + "' and bsb_actvy_dt <= '" + date2 + "'";       
 
